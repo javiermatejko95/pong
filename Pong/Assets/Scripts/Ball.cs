@@ -100,24 +100,14 @@ public class Ball : MonoBehaviour
 
     private void CheckCollision(float newPosX, float newPosY)
     {
-        if (newPosX == leftBound)
+        if (newPosX == leftBound || newPosY == bottomBound)
         {
             movementX = 1f;
         }
 
-        if (newPosX == rightBound)
+        if (newPosX == rightBound || newPosY == topBound)
         {
             movementX = -1f;
-        }
-
-        if (newPosY == bottomBound)
-        {
-            movementY = 1f;
-        }
-
-        if (newPosY == topBound)
-        {
-            movementY = -1f;
         }
 
         if(newPosX > player.transform.position.x - playerSizeX && 
