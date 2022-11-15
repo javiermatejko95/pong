@@ -28,7 +28,7 @@ public class Ball : MonoBehaviour
     private float movementX = 1f;
     private float movementY = 1f;    
 
-    private bool started = false;
+    private bool isPlaying = false;
 
 
 
@@ -59,16 +59,11 @@ public class Ball : MonoBehaviour
 
         playerSizeX = player.GetSpriteRenderer().bounds.size.x / 2;
         playerSizeY = player.GetSpriteRenderer().bounds.size.y / 2;
-
-
-
-
-        started = true;
     }
 
     private void Update()
     {
-        if(started)
+        if(isPlaying)
         {
             Movement();
         }        
@@ -79,6 +74,11 @@ public class Ball : MonoBehaviour
     public void Init()
     {
 
+    }
+
+    public void TogglePlaying(bool status)
+    {
+        isPlaying = status;
     }
     #endregion
 

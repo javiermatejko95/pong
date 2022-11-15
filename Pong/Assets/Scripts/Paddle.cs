@@ -13,7 +13,9 @@ public class Paddle : MonoBehaviour
 
     #region PRIVATE_FIELDS
     private float height = 0f;
-    private float yBound = 0f;    
+    private float yBound = 0f;
+
+    private bool isPlaying = false;
     #endregion
 
     #region UNITY_CALLS
@@ -46,11 +48,21 @@ public class Paddle : MonoBehaviour
     {
         return spriteRenderer;
     }
+
+    public void TogglePlaying(bool status)
+    {
+        isPlaying = status;
+    }
     #endregion
 
     #region PRIVATE_METHODS
     private void Movement()
     {
+        if(!isPlaying)
+        {
+            return;
+        }
+
         float movement = Input.GetAxisRaw("Vertical");
 
         Vector2 pos = transform.position;

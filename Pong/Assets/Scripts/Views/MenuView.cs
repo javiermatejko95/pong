@@ -26,6 +26,8 @@ public class MenuView : MonoBehaviour
         this.difficultyHandlerActions = difficultyHandlerActions;
         this.inputHandlerActions = inputHandlerActions;
 
+        gameControllerActions.onPlay += () => ToggleView(false);
+
         SetPlayButton(gameControllerActions);
         SetDifficultyButtons(difficultyHandlerActions);
         SetInputButtons(inputHandlerActions);
@@ -96,6 +98,11 @@ public class MenuView : MonoBehaviour
         {
             btnsInput[i].ToggleSelected(selectedInput == inputs[i].Input ? true : false);
         }
+    }
+
+    private void ToggleView(bool status)
+    {
+        this.gameObject.SetActive(status);
     }
     #endregion
 }
