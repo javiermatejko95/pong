@@ -8,8 +8,8 @@ public class MenuView : MonoBehaviour
 {
     #region EXPOSED_FIELDS
     [SerializeField] private CustomButton[] btnsDifficulty = null;
-    [SerializeField] private CustomButton[] btnsControl = null;
-    [SerializeField] private Button btnPlay = null;
+    [SerializeField] private CustomButton[] btnsInput = null;
+    [SerializeField] private CustomButton btnPlay = null;
 
     [SerializeField] private Color selectedColor = Color.green;
     [SerializeField] private Color unselectedColor = Color.white;
@@ -17,16 +17,18 @@ public class MenuView : MonoBehaviour
 
     #region PRIVATE_FIELDS
     private DifficultyHandlerActions difficultyHandlerActions = null;
+    private InputHandlerActions inputHandlerActions = null;
     #endregion
 
     #region INIT
-    public void Init(GameControllerActions gameControllerActions, DifficultyHandlerActions difficultyHandlerActions)
+    public void Init(GameControllerActions gameControllerActions, DifficultyHandlerActions difficultyHandlerActions, InputHandlerActions inputHandlerActions)
     {
         this.difficultyHandlerActions = difficultyHandlerActions;
+        this.inputHandlerActions = inputHandlerActions;
 
-        btnPlay.onClick.AddListener(() => gameControllerActions.onPlay?.Invoke());
-
+        SetPlayButton(gameControllerActions);
         SetDifficultyButtons(difficultyHandlerActions);
+        SetInputButtons(inputHandlerActions);
     }
     #endregion
 
@@ -35,6 +37,11 @@ public class MenuView : MonoBehaviour
     #endregion
 
     #region PRIVATE_METHODS
+    private void SetPlayButton(GameControllerActions gameControllerActions)
+    {
+        btnPlay.SetOnClick(gameControllerActions.onPlay);
+    }
+
     private void SetDifficultyButtons(DifficultyHandlerActions difficultyHandlerActions)
     {
         DifficultySO[] difficulties = difficultyHandlerActions.onGetDifficulties?.Invoke();
@@ -63,9 +70,32 @@ public class MenuView : MonoBehaviour
         }
     }
 
-    private void SetControlButtons()
+    private void SetInputButtons(InputHandlerActions inputHandlerActions)
     {
+        InputSO[] inputs = inputHandlerActions.onGetInputs?.Invoke();
+        INPUT selectedInput = (INPUT)inputHandlerActions.onGetSelectedInput?.Invoke();
 
+        for(int i = 0; i < inputs.Length; i++)
+        {
+            INPUT input = inputs[i].Input;
+            btnsInput[i].SetText(input.ToString());
+            btnsInput[i].SetOnClick(() => {
+                inputHandlerActions.onSetInput?.Invoke(input);
+                SetInput(inputs);
+            });
+            btnsInput[i].SetColor(selectedColor, unselectedColor);
+            btnsInput[i].ToggleSelected(selectedInput == input ? true : false);
+        }
+    }
+
+    private void SetInput(InputSO[] inputs)
+    {
+        INPUT selectedInput = (INPUT)inputHandlerActions.onGetSelectedInput?.Invoke();
+
+        for (int i = 0; i < inputs.Length; i++)
+        {
+            btnsInput[i].ToggleSelected(selectedInput == inputs[i].Input ? true : false);
+        }
     }
     #endregion
 }

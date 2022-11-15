@@ -14,8 +14,9 @@ public class GameController : MonoBehaviour
 {
     #region SERIALIZED_FIELDS
     [Header("Handlers"), Space]
+    [SerializeField] private LevelController levelController = null;
     [SerializeField] private DifficultyHandler difficultyHandler = null;
-    [SerializeField] private ControlHandler controlHandler = null;
+    [SerializeField] private InputHandler inputHandler = null;
 
     [Header("Views"), Space]
     [SerializeField] private MenuView menuView = null;
@@ -29,8 +30,9 @@ public class GameController : MonoBehaviour
     private void Awake()
     {
         difficultyHandler.Init();
+        inputHandler.Init();
 
-        menuView.Init(gameControllerActions, difficultyHandler.DifficultyHandlerActions);
+        menuView.Init(gameControllerActions, difficultyHandler.DifficultyHandlerActions, inputHandler.InputHandlerActions);
     }
     #endregion
 

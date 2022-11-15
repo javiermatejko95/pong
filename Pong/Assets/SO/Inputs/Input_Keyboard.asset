@@ -10,6 +10,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0ebd185aaf864ea498e2287ba49dac47, type: 3}
-  m_Name: Control_Keyboard
+  m_Name: Input_Keyboard
   m_EditorClassIdentifier: 
   control: 0
