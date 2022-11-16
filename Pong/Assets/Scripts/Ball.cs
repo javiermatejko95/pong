@@ -35,6 +35,8 @@ public class Ball : MonoBehaviour
 
     private float playerSizeX = 0f;
     private float playerSizeY = 0f;
+
+    private GameControllerActions gameControllerActions = null;
     #endregion
 
     #region ACTIONS
@@ -42,8 +44,20 @@ public class Ball : MonoBehaviour
     #endregion
 
     #region UNITY_CALLS
-    private void Awake()
+    private void Update()
     {
+        if(isPlaying)
+        {
+            Movement();
+        }        
+    }
+    #endregion
+
+    #region PUBLIC_METHODS
+    public void Init(GameControllerActions gameControllerActions)
+    {
+        this.gameControllerActions = gameControllerActions;
+
         yBound = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, Camera.main.transform.position.z)).y;
         xBound = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, Camera.main.transform.position.z)).x;
 
@@ -56,24 +70,8 @@ public class Ball : MonoBehaviour
         leftBound = -xBound + width;
         rightBound = xBound - width;
 
-
         playerSizeX = player.GetSpriteRenderer().bounds.size.x / 2;
         playerSizeY = player.GetSpriteRenderer().bounds.size.y / 2;
-    }
-
-    private void Update()
-    {
-        if(isPlaying)
-        {
-            Movement();
-        }        
-    }
-    #endregion
-
-    #region PUBLIC_METHODS
-    public void Init()
-    {
-
     }
 
     public void TogglePlaying(bool status)
@@ -93,21 +91,25 @@ public class Ball : MonoBehaviour
         pos.x = newPosX;
         pos.y = newPosY;
 
-        CheckCollision(newPosX, newPosY);
+        CheckCollision(newPosX, newPosY, ref pos);
 
         transform.position = pos;
     }
 
-    private void CheckCollision(float newPosX, float newPosY)
+    private void CheckCollision(float newPosX, float newPosY, ref Vector2 pos)
     {
         if (newPosX == leftBound)
         {
             movementX = 1f;
+            pos = Vector2.zero;
+            gameControllerActions.onPlayerTwoScoreGoal?.Invoke();
         }
 
         if (newPosX == rightBound)
         {
             movementX = -1f;
+            pos = Vector2.zero;
+            gameControllerActions.onPlayerOneScoreGoal?.Invoke();
         }
 
         if(newPosY == bottomBound)

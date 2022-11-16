@@ -10,6 +10,8 @@ public class GameControllerActions
     public Action onPlay = null;
     public Action onPlayerOneScoreGoal = null;
     public Action onPlayerTwoScoreGoal = null;
+    public Action onExit = null;
+    public Action<int> onCheckScore = null;
 }
 
 public class GameController : MonoBehaviour
@@ -25,6 +27,7 @@ public class GameController : MonoBehaviour
     [SerializeField] private MenuView menuView = null;
 
     [Header("Players"), Space]
+    [SerializeField] private int totalGoals = 10;
     [SerializeField] private Paddle playerOne = null;
     [SerializeField] private Paddle playerTwo = null;
     [SerializeField] private Ball ball = null;
@@ -37,7 +40,9 @@ public class GameController : MonoBehaviour
     #region UNITY_CALLS
     private void Awake()
     {
-        gameControllerActions.onPlay += Play;        
+        gameControllerActions.onPlay += Play;
+        gameControllerActions.onExit += Exit;
+        gameControllerActions.onCheckScore += CheckScore;
 
         levelController.Init(gameControllerActions);
         scoreController.Init(gameControllerActions);
@@ -46,6 +51,9 @@ public class GameController : MonoBehaviour
         inputHandler.Init();
 
         menuView.Init(gameControllerActions, difficultyHandler.DifficultyHandlerActions, inputHandler.InputHandlerActions);
+
+        playerOne.Init(gameControllerActions);
+        ball.Init(gameControllerActions);
     }
     #endregion
 
@@ -64,6 +72,20 @@ public class GameController : MonoBehaviour
 
             playerOne.TogglePlaying(true);
             ball.TogglePlaying(true);
+        }
+    }
+
+    private void Exit()
+    {
+        playerOne.TogglePlaying(false);
+        ball.TogglePlaying(false);
+    }
+
+    private void CheckScore(int amount)
+    {
+        if(amount >= totalGoals)
+        {
+            gameControllerActions.onExit?.Invoke();
         }
     }
     #endregion

@@ -27,6 +27,7 @@ public class MenuView : MonoBehaviour
         this.inputHandlerActions = inputHandlerActions;
 
         gameControllerActions.onPlay += () => ToggleView(false);
+        gameControllerActions.onExit += () => ToggleView(true);
 
         SetPlayButton(gameControllerActions);
         SetDifficultyButtons(difficultyHandlerActions);

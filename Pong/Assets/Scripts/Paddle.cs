@@ -16,15 +16,11 @@ public class Paddle : MonoBehaviour
     private float yBound = 0f;
 
     private bool isPlaying = false;
+
+    private GameControllerActions gameControllerActions = null;
     #endregion
 
     #region UNITY_CALLS
-    private void Awake()
-    {
-        yBound = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, Camera.main.transform.position.z)).y;
-        height = spriteRenderer.bounds.size.y / 2;
-    }
-
     private void Update()
     {
         if(isCPU)
@@ -39,9 +35,12 @@ public class Paddle : MonoBehaviour
     #endregion
 
     #region PUBLIC_METHODS
-    public void Init()
+    public void Init(GameControllerActions gameControllerActions)
     {
+        gameControllerActions.onExit += ResetPos;
 
+        yBound = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, Camera.main.transform.position.z)).y;
+        height = spriteRenderer.bounds.size.y / 2;
     }
 
     public SpriteRenderer GetSpriteRenderer()
@@ -68,6 +67,13 @@ public class Paddle : MonoBehaviour
         Vector2 pos = transform.position;
         pos.y = Mathf.Clamp(pos.y + movement * speed * Time.deltaTime, -yBound + height, yBound - height);
         transform.position = pos;
+    }
+
+    private void ResetPos()
+    {
+        Vector2 newPos = transform.position;
+        newPos.y = 0;
+        transform.position = newPos;
     }
     #endregion
 }

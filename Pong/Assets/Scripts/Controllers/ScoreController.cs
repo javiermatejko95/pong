@@ -20,6 +20,7 @@ public class ScoreController : MonoBehaviour
     private int scorePlayerTwo = 0;
 
     private ScoreControllerActions scoreControllerActions = new();
+    private GameControllerActions gameControllerActions = null;
     #endregion
 
     #region PROPERTIES
@@ -29,11 +30,20 @@ public class ScoreController : MonoBehaviour
     #region INIT
     public void Init(GameControllerActions gameControllerActions)
     {
+        this.gameControllerActions = gameControllerActions;
+
         scoreControllerActions.onSetScorePlayerOne += scoreView.SetScorePlayerOne;
         scoreControllerActions.onSetScorePlayerTwo += scoreView.SetScorePlayerTwo;
+        
+        gameControllerActions.onPlayerOneScoreGoal += () => {
+            ScorePlayerOne();
+            scoreControllerActions.onSetScorePlayerOne?.Invoke(scorePlayerOne); };
 
-        gameControllerActions.onPlayerOneScoreGoal += () => scoreControllerActions.onSetScorePlayerOne?.Invoke(1);
-        gameControllerActions.onPlayerTwoScoreGoal += () => scoreControllerActions.onSetScorePlayerTwo?.Invoke(1);
+        gameControllerActions.onPlayerTwoScoreGoal += () => {
+            ScorePlayerTwo();
+            scoreControllerActions.onSetScorePlayerTwo?.Invoke(scorePlayerTwo); };
+
+        gameControllerActions.onExit += ResetGame;
 
         ResetGame();
     }
@@ -47,6 +57,18 @@ public class ScoreController : MonoBehaviour
 
         scoreView.SetScorePlayerOne(scorePlayerOne);
         scoreView.SetScorePlayerTwo(scorePlayerTwo);
+    }
+
+    private void ScorePlayerOne()
+    {
+        scorePlayerOne++;
+        gameControllerActions.onCheckScore?.Invoke(scorePlayerOne);
+    }
+
+    private void ScorePlayerTwo()
+    {
+        scorePlayerTwo++;
+        gameControllerActions.onCheckScore?.Invoke(scorePlayerTwo);
     }
     #endregion
 }

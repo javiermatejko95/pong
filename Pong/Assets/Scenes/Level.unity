@@ -2162,6 +2162,7 @@ MonoBehaviour:
   scoreController: {fileID: 1636311286}
   inputHandler: {fileID: 2112849569}
   menuView: {fileID: 1022468373}
+  totalGoals: 2
   playerOne: {fileID: 6739753569178925931}
   playerTwo: {fileID: 1845793616}
   ball: {fileID: 1323588695}

@@ -19,6 +19,7 @@ public class LevelController : MonoBehaviour
         this.gameControllerActions = gameControllerActions;
 
         gameControllerActions.onPlay += () => ToggleView(true);
+        gameControllerActions.onExit += () => ToggleView(false);
     }
     #endregion
 
