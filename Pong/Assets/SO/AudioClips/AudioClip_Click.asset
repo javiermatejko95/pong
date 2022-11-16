@@ -9,8 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5b0af455a6036d146bbb7638d6f6cd4a, type: 3}
-  m_Name: Difficulty_Easy
+  m_Script: {fileID: 11500000, guid: 5fe6ae61d9605694aaa2d5162ddf5c09, type: 3}
+  m_Name: AudioClip_Click
   m_EditorClassIdentifier: 
-  difficulty: 0
-  speedMultiplier: 0.7
+  id: Click
+  clips:
+  - {fileID: 8300000, guid: 0f202e84fdc4ad645b236ab7fad56d39, type: 3}

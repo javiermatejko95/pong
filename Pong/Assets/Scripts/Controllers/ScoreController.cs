@@ -62,13 +62,13 @@ public class ScoreController : MonoBehaviour
     private void ScorePlayerOne()
     {
         scorePlayerOne++;
-        gameControllerActions.onCheckScore?.Invoke(scorePlayerOne);
+        gameControllerActions.onCheckScore?.Invoke(scorePlayerOne, true);
     }
 
     private void ScorePlayerTwo()
     {
         scorePlayerTwo++;
-        gameControllerActions.onCheckScore?.Invoke(scorePlayerTwo);
+        gameControllerActions.onCheckScore?.Invoke(scorePlayerTwo, false);
     }
     #endregion
 }

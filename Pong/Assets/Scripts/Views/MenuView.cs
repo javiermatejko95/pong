@@ -21,7 +21,7 @@ public class MenuView : MonoBehaviour
     #endregion
 
     #region INIT
-    public void Init(GameControllerActions gameControllerActions, DifficultyHandlerActions difficultyHandlerActions, InputHandlerActions inputHandlerActions)
+    public void Init(GameControllerActions gameControllerActions, DifficultyHandlerActions difficultyHandlerActions, InputHandlerActions inputHandlerActions, AudioHandlerActions audioHandlerActions)
     {
         this.difficultyHandlerActions = difficultyHandlerActions;
         this.inputHandlerActions = inputHandlerActions;
@@ -29,9 +29,9 @@ public class MenuView : MonoBehaviour
         gameControllerActions.onPlay += () => ToggleView(false);
         gameControllerActions.onExit += () => ToggleView(true);
 
-        SetPlayButton(gameControllerActions);
-        SetDifficultyButtons(difficultyHandlerActions);
-        SetInputButtons(inputHandlerActions);
+        SetPlayButton(gameControllerActions, audioHandlerActions);
+        SetDifficultyButtons(difficultyHandlerActions, audioHandlerActions);
+        SetInputButtons(inputHandlerActions, audioHandlerActions);
     }
     #endregion
 
@@ -40,40 +40,45 @@ public class MenuView : MonoBehaviour
     #endregion
 
     #region PRIVATE_METHODS
-    private void SetPlayButton(GameControllerActions gameControllerActions)
+    private void SetPlayButton(GameControllerActions gameControllerActions, AudioHandlerActions audioHandlerActions)
     {
-        btnPlay.SetOnClick(gameControllerActions.onPlay);
+        btnPlay.SetOnClick(() => {
+            gameControllerActions.onPlay?.Invoke();
+            audioHandlerActions.onUIClick?.Invoke();
+            }
+        );
     }
 
-    private void SetDifficultyButtons(DifficultyHandlerActions difficultyHandlerActions)
+    private void SetDifficultyButtons(DifficultyHandlerActions difficultyHandlerActions, AudioHandlerActions audioHandlerActions)
     {
         DifficultySO[] difficulties = difficultyHandlerActions.onGetDifficulties?.Invoke();
-        DIFFICULTY difficultySelected = (DIFFICULTY)(difficultyHandlerActions.onGetDifficultySelected?.Invoke());
+        DifficultySO difficultySelected = difficultyHandlerActions.onGetDifficultySelected?.Invoke();
 
         for (int i = 0; i < difficulties.Length; i++)
         {
-            DIFFICULTY diff = difficulties[i].Difficulty;
-            btnsDifficulty[i].SetText(diff.ToString());
+            DifficultySO diff = difficulties[i];
+            btnsDifficulty[i].SetText(diff.Difficulty.ToString());
             btnsDifficulty[i].SetOnClick(() => {
                 difficultyHandlerActions.onSetDifficulty?.Invoke(diff);
                 SetDifficulty(difficulties);
+                audioHandlerActions.onUIClick?.Invoke();
                 });
             btnsDifficulty[i].SetColor(selectedColor, unselectedColor);
-            btnsDifficulty[i].ToggleSelected(difficultySelected == diff ? true : false);
+            btnsDifficulty[i].ToggleSelected(difficultySelected.Difficulty == diff.Difficulty ? true : false);
         }
     }
 
     private void SetDifficulty(DifficultySO[] difficulties)
     {
-        DIFFICULTY difficultySelected = (DIFFICULTY)difficultyHandlerActions.onGetDifficultySelected?.Invoke();
+        DifficultySO difficultySelected = difficultyHandlerActions.onGetDifficultySelected?.Invoke();
 
         for (int i = 0; i < difficulties.Length; i++)
         {
-            btnsDifficulty[i].ToggleSelected(difficultySelected == difficulties[i].Difficulty ? true : false);
+            btnsDifficulty[i].ToggleSelected(difficultySelected.Difficulty == difficulties[i].Difficulty ? true : false);
         }
     }
 
-    private void SetInputButtons(InputHandlerActions inputHandlerActions)
+    private void SetInputButtons(InputHandlerActions inputHandlerActions, AudioHandlerActions audioHandlerActions)
     {
         InputSO[] inputs = inputHandlerActions.onGetInputs?.Invoke();
         INPUT selectedInput = (INPUT)inputHandlerActions.onGetSelectedInput?.Invoke();
@@ -85,6 +90,7 @@ public class MenuView : MonoBehaviour
             btnsInput[i].SetOnClick(() => {
                 inputHandlerActions.onSetInput?.Invoke(input);
                 SetInput(inputs);
+                audioHandlerActions.onUIClick?.Invoke();
             });
             btnsInput[i].SetColor(selectedColor, unselectedColor);
             btnsInput[i].ToggleSelected(selectedInput == input ? true : false);

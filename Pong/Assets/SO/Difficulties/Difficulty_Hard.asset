@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: Difficulty_Hard
   m_EditorClassIdentifier: 
   difficulty: 2
-  speedMultiplier: 2
+  speedMultiplier: 1

@@ -5,9 +5,9 @@ using UnityEngine;
 
 public class DifficultyHandlerActions
 {
-    public Action<DIFFICULTY> onSetDifficulty = null;
+    public Action<DifficultySO> onSetDifficulty = null;
     public Func<DifficultySO[]> onGetDifficulties = null;
-    public Func<DIFFICULTY> onGetDifficultySelected = null;
+    public Func<DifficultySO> onGetDifficultySelected = null;
 }
 
 public class DifficultyHandler : MonoBehaviour
@@ -18,7 +18,7 @@ public class DifficultyHandler : MonoBehaviour
     #endregion
 
     #region PRIVATE_FIELDS
-    private DIFFICULTY difficultySelected = default;
+    private DifficultySO difficultySelected = null;
 
     private DifficultyHandlerActions difficultyHandlerActions = new();
     #endregion
@@ -33,6 +33,8 @@ public class DifficultyHandler : MonoBehaviour
         difficultyHandlerActions.onGetDifficulties += GetDifficulties;
         difficultyHandlerActions.onGetDifficultySelected += GetDifficultySelected;
         difficultyHandlerActions.onSetDifficulty += SetDifficulty;
+
+        difficultySelected = difficulties[0];
     }
     #endregion
 
@@ -42,14 +44,14 @@ public class DifficultyHandler : MonoBehaviour
         return difficulties;
     }
 
-    public DIFFICULTY GetDifficultySelected()
+    public DifficultySO GetDifficultySelected()
     {
         return difficultySelected;
     }
     #endregion
 
     #region PRIVATE_METHODS
-    private void SetDifficulty(DIFFICULTY difficulty)
+    private void SetDifficulty(DifficultySO difficulty)
     {
         difficultySelected = difficulty;
     }
