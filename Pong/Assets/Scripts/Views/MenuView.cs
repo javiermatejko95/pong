@@ -1,8 +1,4 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class MenuView : MonoBehaviour
 {
@@ -33,10 +29,6 @@ public class MenuView : MonoBehaviour
         SetDifficultyButtons(difficultyHandlerActions, audioHandlerActions);
         SetInputButtons(inputHandlerActions, audioHandlerActions);
     }
-    #endregion
-
-    #region PUBLIC_METHODS
-
     #endregion
 
     #region PRIVATE_METHODS

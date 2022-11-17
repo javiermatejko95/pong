@@ -1,18 +1,15 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PowerUp : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    #region EXPOSED_FIELDS
+    [SerializeField] private SpriteRenderer spriteRenderer = null;
+    #endregion
 
-    // Update is called once per frame
-    void Update()
+    #region PUBLIC_METHODS
+    public SpriteRenderer GetSpriteRenderer()
     {
-        
+        return spriteRenderer;
     }
+    #endregion
 }

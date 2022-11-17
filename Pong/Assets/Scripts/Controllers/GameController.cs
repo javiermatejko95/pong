@@ -1,9 +1,7 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 
 using UnityEngine;
-using UnityEngine.UI;
 
 public class GameControllerActions
 {
@@ -12,7 +10,7 @@ public class GameControllerActions
     public Action onPlayerTwoScoreGoal = null;
     public Action onExit = null;
     public Action<int, bool> onCheckScore = null;
-    public Action onPowerUp = null;
+    public Action<POSSESSION> onPowerUp = null;
     public Action onPowerUpFinish = null;
 }
 
@@ -25,6 +23,7 @@ public class GameController : MonoBehaviour
     [SerializeField] private ScoreController scoreController = null;
     [SerializeField] private InputHandler inputHandler = null;
     [SerializeField] private AudioHandler audioHandler = null;
+    [SerializeField] private PowerUpHandler powerUpHandler = null;
 
     [Header("Views"), Space]
     [SerializeField] private MenuView menuView = null;
@@ -34,6 +33,7 @@ public class GameController : MonoBehaviour
     [SerializeField] private Paddle playerOne = null;
     [SerializeField] private Paddle playerTwo = null;
     [SerializeField] private Ball ball = null;
+    [SerializeField] private PowerUp powerUp = null;
     [SerializeField] private Camera camera = null;
     #endregion
 
@@ -52,21 +52,22 @@ public class GameController : MonoBehaviour
         levelController.Init(gameControllerActions);
         scoreController.Init(gameControllerActions);
 
+        Vector3 cameraBounds = GetBounds();
+
         difficultyHandler.Init();
         inputHandler.Init();
         audioHandler.Init(gameControllerActions);
+        powerUpHandler.Init(gameControllerActions, cameraBounds);
 
         audioHandlerActions = audioHandler.AudioHandlerActions;
 
-        menuView.Init(gameControllerActions, difficultyHandler.DifficultyHandlerActions, inputHandler.InputHandlerActions, audioHandlerActions);
-
-        Vector3 cameraBounds = GetBounds();
+        menuView.Init(gameControllerActions, difficultyHandler.DifficultyHandlerActions, inputHandler.InputHandlerActions, audioHandlerActions);        
 
         playerOne.Init(gameControllerActions, camera, cameraBounds);
         playerTwo.Init(gameControllerActions, camera, cameraBounds);
         playerTwo.SetBall(ball);
 
-        ball.Init(gameControllerActions, audioHandlerActions, camera, cameraBounds);
+        ball.Init(gameControllerActions, audioHandlerActions, camera, cameraBounds, powerUp);
     }
     #endregion
 

@@ -1,6 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public enum POSSESSION
@@ -13,14 +10,16 @@ public enum POSSESSION
 public class Ball : MonoBehaviour
 {
     #region SERIALIZED_FIELDS
-    [SerializeField] private float speed = 7f;
-
     [SerializeField] private SpriteRenderer spriteRenderer = null;
     [SerializeField] private Paddle playerOne = null;
     [SerializeField] private Paddle playerTwo = null;
     #endregion
 
     #region PRIVATE_FIELDS
+    private float speed = 7f;
+    private float originalSpeed = 0f;
+    private float modifiedSpeed = 0f;
+
     private Camera camera = null;
 
     private float height = 0f;
@@ -40,10 +39,18 @@ public class Ball : MonoBehaviour
 
     private bool isPlaying = false;
 
-    private float playerSizeX = 0f;
-    private float playerSizeY = 0f;
+    private float playerOneSizeX = 0f;
+    private float playerOneSizeY = 0f;
+
+    private float playerTwoSizeX = 0f;
+    private float playerTwoSizeY = 0f;
+
+    private float powerUpSizeX = 0f;
+    private float powerUpSizeY = 0f;
 
     private POSSESSION currentPossession = default;
+
+    private PowerUp powerUp = null;
 
     private GameControllerActions gameControllerActions = null;
     private AudioHandlerActions audioHandlerActions = null;
@@ -60,12 +67,32 @@ public class Ball : MonoBehaviour
     #endregion
 
     #region PUBLIC_METHODS
-    public void Init(GameControllerActions gameControllerActions, AudioHandlerActions audioHandlerActions, Camera camera,Vector3 cameraBounds)
+    public void Init(GameControllerActions gameControllerActions, AudioHandlerActions audioHandlerActions, Camera camera,Vector3 cameraBounds, PowerUp powerUp)
     {
         this.gameControllerActions = gameControllerActions;
         this.audioHandlerActions = audioHandlerActions;
 
+        this.gameControllerActions.onPowerUp += (poss) =>
+        {
+            SetModifiedSpeed();
+            UpdatePlayersSize();
+        };
+        this.gameControllerActions.onPowerUpFinish += () =>
+        {
+            SetOriginalSpeed();
+            UpdatePlayersSize();
+        };
+        this.gameControllerActions.onPlay += () =>
+        {
+            SetOriginalSpeed();
+            UpdatePlayersSize();
+        };
+        this.gameControllerActions.onPlayerOneScoreGoal += SetOriginalSpeed;
+        this.gameControllerActions.onPlayerTwoScoreGoal += SetOriginalSpeed;
+
         this.camera = camera;
+
+        this.powerUp = powerUp;
 
         xBound = cameraBounds.x;
         yBound = cameraBounds.y;
@@ -79,10 +106,14 @@ public class Ball : MonoBehaviour
         leftBound = -xBound + width;
         rightBound = xBound - width;
 
-        playerSizeX = playerOne.GetSpriteRenderer().bounds.size.x / 2;
-        playerSizeY = playerOne.GetSpriteRenderer().bounds.size.y / 2;
+        UpdatePlayersSize();
+
+        powerUpSizeX = powerUp.GetSpriteRenderer().bounds.size.x / 2;
+        powerUpSizeY = powerUp.GetSpriteRenderer().bounds.size.y / 2;
 
         speed = (xBound + yBound) / 2;
+        originalSpeed = speed;
+        modifiedSpeed = speed + (speed / 2);
     }
 
     public void TogglePlaying(bool status)
@@ -109,6 +140,23 @@ public class Ball : MonoBehaviour
 
     private void CheckCollision(float newPosX, float newPosY, ref Vector2 pos)
     {
+        CheckCollisionWithLeftBound(newPosX, ref pos);
+
+        CheckCollisionWithRightBound(newPosX, ref pos);
+
+        CheckCollisionWithBottomBound(newPosY);
+
+        CheckCollsionWithTopBound(newPosY);
+
+        CheckCollsionWithPlayerOne(playerOne.transform, newPosX, newPosY);
+
+        CheckCollsionWithPlayerTwo(playerTwo.transform, newPosX, newPosY);
+
+        CheckCollisionWithPowerUp(powerUp.transform, newPosX, newPosY);
+    }
+
+    private void CheckCollisionWithLeftBound(float newPosX, ref Vector2 pos)
+    {
         if (newPosX == leftBound)
         {
             movementX = 1f;
@@ -117,7 +165,10 @@ public class Ball : MonoBehaviour
             audioHandlerActions.onPongHit?.Invoke();
             SetPossession(POSSESSION.NONE);
         }
+    }
 
+    private void CheckCollisionWithRightBound(float newPosX, ref Vector2 pos)
+    {
         if (newPosX == rightBound)
         {
             movementX = -1f;
@@ -126,37 +177,64 @@ public class Ball : MonoBehaviour
             audioHandlerActions.onPongHit?.Invoke();
             SetPossession(POSSESSION.NONE);
         }
+    }
 
-        if(newPosY == bottomBound)
+    private void CheckCollisionWithBottomBound(float newPosY)
+    {
+        if (newPosY == bottomBound)
         {
             movementY = 1f;
             audioHandlerActions.onPongHit?.Invoke();
         }
+    }
 
-        if(newPosY == topBound)
+    private void CheckCollsionWithTopBound(float newPosY)
+    {
+        if (newPosY == topBound)
         {
             movementY = -1f;
             audioHandlerActions.onPongHit?.Invoke();
         }
+    }
 
-        if(newPosX > playerOne.transform.position.x - playerSizeX && 
-            newPosX < playerOne.transform.position.x + playerSizeX &&
-            newPosY > playerOne.transform.position.y - playerSizeY &&
-            newPosY < playerOne.transform.position.y + playerSizeY)
+    private void CheckCollsionWithPlayerOne(Transform player, float newPosX, float newPosY)
+    {
+        if (newPosX > player.transform.position.x - playerOneSizeX &&
+            newPosX < player.transform.position.x + playerOneSizeX &&
+            newPosY > player.transform.position.y - playerOneSizeY &&
+            newPosY < player.transform.position.y + playerOneSizeY)
         {
             movementX = 1f;
             audioHandlerActions.onPongHit?.Invoke();
             SetPossession(POSSESSION.PLAYER1);
         }
+    }
 
-        if (newPosX > playerTwo.transform.position.x - playerSizeX &&
-            newPosX < playerTwo.transform.position.x + playerSizeX &&
-            newPosY > playerTwo.transform.position.y - playerSizeY &&
-            newPosY < playerTwo.transform.position.y + playerSizeY)
+    private void CheckCollsionWithPlayerTwo(Transform player, float newPosX, float newPosY)
+    {
+        if (newPosX > player.transform.position.x - playerOneSizeX &&
+            newPosX < player.transform.position.x + playerOneSizeX &&
+            newPosY > player.transform.position.y - playerOneSizeY &&
+            newPosY < player.transform.position.y + playerOneSizeY)
         {
             movementX = -1f;
             audioHandlerActions.onPongHit?.Invoke();
             SetPossession(POSSESSION.PLAYER2);
+        }
+    }
+
+    private void CheckCollisionWithPowerUp(Transform powerUp, float newPosX, float newPosY)
+    {
+        if (newPosX > powerUp.transform.position.x - powerUpSizeX &&
+            newPosX < powerUp.transform.position.x + powerUpSizeX &&
+            newPosY > powerUp.transform.position.y - powerUpSizeY &&
+            newPosY < powerUp.transform.position.y + powerUpSizeY)
+        {
+            if(currentPossession != POSSESSION.NONE && powerUp.gameObject.activeSelf)
+            {
+                gameControllerActions.onPowerUp?.Invoke(currentPossession);
+                audioHandlerActions.onPongHit?.Invoke();
+            }            
         }
     }
 
@@ -171,6 +249,25 @@ public class Ball : MonoBehaviour
     private void SetPossession(POSSESSION currentPossession)
     {
         this.currentPossession = currentPossession;
+    }
+
+    private void SetOriginalSpeed()
+    {
+        speed = originalSpeed;
+    }
+
+    private void SetModifiedSpeed()
+    {
+        speed = modifiedSpeed;
+    }
+
+    private void UpdatePlayersSize()
+    {
+        playerOneSizeX = playerOne.GetSpriteRenderer().bounds.size.x / 2;
+        playerOneSizeY = playerOne.GetSpriteRenderer().bounds.size.y / 2;
+
+        playerTwoSizeX = playerTwo.GetSpriteRenderer().bounds.size.x / 2;
+        playerTwoSizeY = playerTwo.GetSpriteRenderer().bounds.size.y / 2;
     }
     #endregion
 }

@@ -1,5 +1,5 @@
 using System.Collections;
-using System.Collections.Generic;
+
 using UnityEngine;
 
 public class Paddle : MonoBehaviour
@@ -8,6 +8,7 @@ public class Paddle : MonoBehaviour
     [SerializeField] private float speed = 7f;
     [SerializeField] private float startingPosX = 1f;
     [SerializeField] private bool isCPU = false;
+    [SerializeField] private POSSESSION myPossession = default;
 
     [SerializeField] private SpriteRenderer spriteRenderer = null;
     #endregion
@@ -21,6 +22,12 @@ public class Paddle : MonoBehaviour
     private float xBound = 0f;
     private float yBound = 0f;
 
+    private float originalWidth = 0f;
+    private float modifiedWidth = 0f;
+
+    private float originalHeight = 0f;
+    private float modifiedHeight = 0f;
+
     private bool isPlaying = false;
 
     private float difficultySpeed = 1f;
@@ -28,7 +35,7 @@ public class Paddle : MonoBehaviour
     private Vector3 originalScale = new Vector3();
     private Vector3 modifiedScale = new Vector3();
 
-    private INPUT input = default;
+    private INPUT input = default;    
 
     private Ball ball = null;
     #endregion
@@ -47,20 +54,29 @@ public class Paddle : MonoBehaviour
         {
             ResetPos();
             SetOriginalScale();
+            SetOriginalBounds();
             StopAllCoroutines();
         };
 
-        gameControllerActions.onPowerUp += () => {
+        gameControllerActions.onPowerUp += (poss) => {
             
-            SetPowerUp(gameControllerActions);
+            if(poss == myPossession)
+            {
+                SetPowerUp(gameControllerActions);
+            }            
         };
-        gameControllerActions.onPowerUpFinish += SetOriginalScale;
+        gameControllerActions.onPowerUpFinish += () =>
+        {
+            SetOriginalScale();
+            SetOriginalBounds();
+        };
 
         this.camera = camera;
 
         xBound = cameraBounds.x;
-        yBound = cameraBounds.y;        
+        yBound = cameraBounds.y;
 
+        SetBounds();
         SetScales();
         ResetPos();
     }
@@ -92,6 +108,7 @@ public class Paddle : MonoBehaviour
 
     public void SetPowerUp(GameControllerActions gameControllerActions)
     {
+        SetModifiedBounds();
         SetModifiedScale();
 
         StartCoroutine(ICountdown());
@@ -169,16 +186,32 @@ public class Paddle : MonoBehaviour
     private void SetOriginalScale()
     {
         transform.localScale = originalScale;
-        SetBounds();
     }
 
     private void SetModifiedScale()
     {
         transform.localScale = modifiedScale;
-        SetBounds();
     }
 
     private void SetBounds()
+    {
+        width = spriteRenderer.bounds.size.x / 2;
+        height = spriteRenderer.bounds.size.y / 2;
+
+        originalWidth = width;
+        modifiedWidth = width + (20f * width / 100f);
+
+        originalHeight = height;
+        modifiedHeight = height + (20f * height / 100f);
+    }
+
+    private void SetOriginalBounds()
+    {
+        width = originalWidth;
+        height = originalHeight;
+    }
+
+    private void SetModifiedBounds()
     {
         width = spriteRenderer.bounds.size.x / 2;
         height = spriteRenderer.bounds.size.y / 2;
