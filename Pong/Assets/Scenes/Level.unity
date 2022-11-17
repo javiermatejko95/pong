@@ -2207,6 +2207,7 @@ MonoBehaviour:
   scoreController: {fileID: 1636311286}
   inputHandler: {fileID: 2112849569}
   audioHandler: {fileID: 1465427031}
+  powerUpHandler: {fileID: 530008527}
   menuView: {fileID: 1022468373}
   totalGoals: 10
   playerOne: {fileID: 6739753569178925931}
@@ -4459,6 +4460,10 @@ PrefabInstance:
     - target: {fileID: 7520722234527537396, guid: 25695faa1941f914a9cf4f353bfdbbd0, type: 3}
       propertyPath: m_Name
       value: PowerUp
+      objectReference: {fileID: 0}
+    - target: {fileID: 7520722234527537396, guid: 25695faa1941f914a9cf4f353bfdbbd0, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 25695faa1941f914a9cf4f353bfdbbd0, type: 3}
